@@ -56,5 +56,5 @@ end
    task :restart, :roles => :app, :except => { :no_release => true } do
 #     run "#{try_sudo} touch #{File.join(current_path,'tmp','restart.txt')}"
       run "cd /home/vagrant/test_deploy/current; bundle exec unicorn_rails -c /tmp/unicorn.pid -D"   
-   end
-# end
+   end 
+ end
