@@ -50,11 +50,23 @@ end
 # If you are using Passenger mod_rails uncomment this:
  namespace :deploy do
    task :start do
-      run "cd /home/vagrant/test_deploy/current; bundle exec unicorn_rails -c /tmp/unicorn.pid -D"   
+      run "cd /home/vagrant/test_deploy/current; bundle exec unicorn_rails -c /home/vagrant/test_deploy/current/config/unicorn.rb -D"   
   end
 #   task :stop do ; end
    task :restart, :roles => :app, :except => { :no_release => true } do
 #     run "#{try_sudo} touch #{File.join(current_path,'tmp','restart.txt')}"
-      run "cd /home/vagrant/test_deploy/current; bundle exec unicorn_rails -c /tmp/unicorn.pid -D"   
+      run "cd /home/vagrant/test_deploy/current; bundle ;bundle exec unicorn_rails -c /home/vagrant/test_deploy/current/config/unicorn.rb -D"   
    end 
+   
+  task :setup_config, roles: :app do
+    run "pwd"
+    sudo "ln -nfs #{current_path}/config/nginx.conf /etc/nginx/sites-enabled/#{application}"
+    #sudo "ln -nfs #{current_path}/config/unicorn_ini.sh /etc/init.d/unicorn_#{application}"
+    #run "mkdir -p #{shared_path}/config"
+    #put File.read("config/database.yml"), "#{shared_path}/config/database.yml"
+    #puts "Now edit the config files in #{shared_path}."
+  end
+
+  after "deploy:setup", "deploy:setup_config"
+
  end
