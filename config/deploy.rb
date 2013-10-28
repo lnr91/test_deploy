@@ -1,6 +1,6 @@
 set :application, "test_deploy"
 set :repository,  "git@github.com:lnr91/test_deploy.git"
-set :deploy_to, "/home/vagrant/test_deploy"
+set :deploy_to, "/home/vagrant/#{application}"
 set :scm, :git
 set :branch, "master"
 set :user, "vagrant"
@@ -9,8 +9,10 @@ set :deploy_via, :copy
 set :ssh_options, {:forward_agent=>true}
 default_run_options[:pty] = true
 server "10.123.61.15", :app, :web, :db, :primary => true
-before "deploy","deploy:checkit"
+#before "deploy","deploy:checkit"
 after "deploy:update_code","deploy:bundle_install"
+after "deploy:update_code", "deploy:setup_config"
+
 set :default_environment, {
   'PATH' => "/opt/rbenv/shims:$PATH"
 }
@@ -33,10 +35,6 @@ role :db,  "your slave db-server here"
 # these http://github.com/rails/irs_process_scripts
 
 namespace :deploy do
-   task :checkit do
-     run "which ruby"
-    end
-
 	task :bundle_install do
 		run "cd /var/www/test_deploy/current;bundle install"
 	end
@@ -47,11 +45,12 @@ namespace :deploy do
 end
 
 
-# If you are using Passenger mod_rails uncomment this:
  namespace :deploy do
+=begin
    task :start do
       run "cd /home/vagrant/test_deploy/current; bundle exec unicorn_rails -c /home/vagrant/test_deploy/current/config/unicorn.rb -D"   
   end
+=end
 #   task :stop do ; end
    task :restart, :roles => :app, :except => { :no_release => true } do
 #     run "#{try_sudo} touch #{File.join(current_path,'tmp','restart.txt')}"
@@ -67,6 +66,5 @@ end
     #puts "Now edit the config files in #{shared_path}."
   end
 
-  after "deploy:setup", "deploy:setup_config"
 
  end
